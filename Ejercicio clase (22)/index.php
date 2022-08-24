@@ -19,7 +19,7 @@
         }
     </style>
 
-    <canvas id="canvas" width="300" height="300">
+    <canvas id="canvas" width="500" height="500">
         Tu navegador no admite el elemento &lt;canvas&gt;.
     </canvas>
 
@@ -32,6 +32,9 @@
         let canvas = null;
         let context = null;
         let player1 = null;
+        let player2 = null;
+        let score = 0;
+        let speed = 10;
 
 
 
@@ -40,6 +43,9 @@
         let isPress = false;
         let x = 240;
         let y = 240;
+        let direction = 'up';
+
+
 
 
 
@@ -48,102 +54,14 @@
             context = canvas.getContext('2d');
             canvas.style.background = "#ff8";
 
-            player1 = new Cuadrado(x,y,40,40,'red');
+            player1 = new Cuadrado(x, y, 40, 40, 'red');
+            player2 = new Cuadrado(getRandomInt(460), getRandomInt(460), 40, 40, 'red');
 
             paint();
         }
-        // Linear Gradient Drawing
-
-        // let linear = context.createLinearGradient(10, 10, 10, 190);
-        // linear.addColorStop(0, "red");
-        // linear.addColorStop(0.5, "green");
-        // linear.addColorStop(1, "blue");
-
-        // context.fillStyle = linear;
-        // context.fillRect(10, 10, 200, 200);
-
-        // Radial gradient
-
-        // let grd = context.createRadialGradient(75, 50, 5, 90, 60, 100);
-        // grd.addColorStop(0, "red");
-        // grd.addColorStop(1, "white");
-
-        // Fill with gradient
-        // context.fillStyle = grd;
-        // context.fillRect(10, 10, 150, 80);
 
 
-        // var image = document.getElementById('source');
-        // context.drawImage(image, 0,0,100,100);
 
-
-        /*
-        canvas.addEventListener('click', ({
-            offsetX,
-            offsetY
-        }) => {
-
-            context.fillStyle = color;
-            context.strokeStyle = "red";
-
-            if (figura == 'rectangulo') {
-                context.beginPath();
-                context.fillRect(offsetX - 20, offsetY - 20, 40, 40);
-                context.stroke();
-                context.fill();
-                context.closePath();
-
-            } else if (figura == 'circulo') {
-                // arc = Circulo
-                context.beginPath();
-                context.arc(offsetX, offsetY, 50, 0, 2 * Math.PI); // x,y,diametro,angulo inicial, el calculo para el redondeo;
-                context.stroke();
-                context.fill()
-                context.closePath();
-            }
-
-
-        });
-
-        canvas.addEventListener('mouseover', () => {
-            color = getRandomColor();
-        });
-
-
-        canvas.addEventListener('mouseout', () => {
-            figura = (figura == 'circulo') ? 'rectangulo' : 'circulo';
-        });
-
-        // Mouse move event
-        canvas.addEventListener('mousemove', ({
-            offsetX,
-            offsetY
-        }) => {
-
-            if(isPress == true){
-                context.fillStyle = getRandomColor();
-                context.fillRect(offsetX - 5, offsetY - 5, 10, 10);
-            }
-
-        });
-
-        canvas.addEventListener('mousedown', () => {
-            isPress = true;
-
-        });
-        
-        canvas.addEventListener('mouseup', () => {
-            isPress = false;
-
-        });
-
-
-        
-
-        */
-
-
-        
 
         //  Funcion de pintar
         const paint = () => {
@@ -152,21 +70,52 @@
 
             // Rellenar el canvas y hacer como que borra el trayecto
             context.fillStyle = "#ff8";
-            context.fillRect(0, 0, 300, 300);
+            context.fillRect(0, 0, 500, 500);
+
+            context.fillStyle = "#000";
+            context.font = "25px Arial";
+            context.fillText("Score: " + score + "                                   " + "Speed: "+ speed,20,40);
 
             // Creando el rectangulo que se pinta conforme la tecla
             player1.color = getRandomColor();
             player1.dibujar(context);
 
+            player2.dibujar(context);
             update();
         }
 
         const update = () => {
-            player1.x += 5;
-            player1.y = 150;
 
-            if (player1.x > 300) {
-                player1.x = 0;
+            if (direction === 'down') {
+                player1.y += speed;
+                if (player1.y > 500) {
+                    player1.y = 0
+                }
+            }
+            if (direction === 'up') {
+                player1.y -= speed;
+                if (player1.y < 0) {
+                    player1.y = 500;
+                }
+            }
+            if (direction === 'right') {
+                player1.x += speed;
+                if (player1.x > 500) {
+                    player1.x = 0;
+                }
+            }
+            if (direction === 'left') {
+                player1.x -= speed;
+                if (player1.x < 0) {
+                    player1.x = 500;
+                }
+            }
+
+            if (player1.se_tocan(player2)){
+                player2.x = getRandomInt(400);
+                player2.y = getRandomInt(400);
+                score += 10;
+                speed += 5;
             }
         };
 
@@ -185,7 +134,25 @@
                 context.fillRect(this.x, this.y, this.w, this.h);
                 context.strokeRect(this.x, this.y, this.w, this.h);
             }
+
+            se_tocan = function(target) {
+
+
+
+                if (this.x < target.x + target.w &&
+
+                    this.x + this.w > target.x &&
+
+                    this.y < target.y + target.h &&
+
+                    this.y + this.h > target.y)
+                {
+                    return true;
+                }
+            };
         }
+
+
 
         // Funcion para cambiar de color 
         function getRandomColor() {
@@ -197,6 +164,38 @@
             return color;
         }
 
+
+        // Generar numero random
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        // Movimiento con tecla y flechas
+
+        document.addEventListener('keydown', ({
+            keyCode
+        }) => {
+            // arriba
+            if (keyCode == 87 || keyCode == 38) {
+                direction = 'up';
+            }
+            // derecha
+            if (keyCode == 68 || keyCode == 39) {
+                direction = 'right';
+            }
+
+            // abajo
+            if (keyCode == 83 || keyCode == 40) {
+                direction = 'down';
+
+            }
+
+            // izquierda
+            if (keyCode == 65 || keyCode == 37) {
+                direction = 'left';
+            }
+        })
+
         window.addEventListener("load", start);
 
         window.requestAnimationFrame = (function() {
@@ -207,7 +206,6 @@
                     window.setTimeout(callback, 17);
                 };
         }());
-        
     </script>
 </body>
 
