@@ -23,8 +23,6 @@
         Tu navegador no admite el elemento &lt;canvas&gt;.
     </canvas>
 
-    <img id="source" src="./img/react.png" width="300" height="227" style="display:none">
-
 
     <script type="text/javascript">
         //  * Actividad 7 *
@@ -33,8 +31,19 @@
         let context = null;
         let player1 = null;
         let player2 = null;
+        
+        /*
+            TODO: Hacer un ciclo para generar crear objetos cuadrados y que se pinten por el mapa
+            * For
+            * Validar que el objeto nuestro toque cualquier pared y igualar la velocidad a 0 para que este se pare
+            ! Agregar pantalla de muerte y si el usuario ingresa la tecla F pueda volver a empezar
+            * Variable para validar cuando toque morir, y cuando ingrese la tecla F pueda volver, se validara este estado siempre que empieze el juego en la funcion start()
+        */
+        let arregloParedes = []; 
+        
         let score = 0;
         let speed = 10;
+        let pause = false;
 
 
 
@@ -74,14 +83,23 @@
 
             context.fillStyle = "#000";
             context.font = "25px Arial";
-            context.fillText("Score: " + score + "                                   " + "Speed: "+ speed,20,40);
+            context.fillText("Score: " + score + "                                   " + "Speed: " + speed, 20, 40);
 
             // Creando el rectangulo que se pinta conforme la tecla
             player1.color = getRandomColor();
             player1.dibujar(context);
-
             player2.dibujar(context);
-            update();
+
+
+            if (!pause) {
+                update();
+            } else {
+                context.fillStyle = "rgba(0,0,0,0.5)";
+                context.fillRect(0, 0, 500, 500);
+                context.fillStyle = "#fff";
+                context.font = "30px Arial";
+                context.fillText("Pause", 200, 250);
+            }
         }
 
         const update = () => {
@@ -111,7 +129,8 @@
                 }
             }
 
-            if (player1.se_tocan(player2)){
+
+            if (player1.se_tocan(player2)) {
                 player2.x = getRandomInt(400);
                 player2.y = getRandomInt(400);
                 score += 10;
@@ -145,8 +164,7 @@
 
                     this.y < target.y + target.h &&
 
-                    this.y + this.h > target.y)
-                {
+                    this.y + this.h > target.y) {
                     return true;
                 }
             };
@@ -193,6 +211,11 @@
             // izquierda
             if (keyCode == 65 || keyCode == 37) {
                 direction = 'left';
+            }
+
+            // Pause
+            if (keyCode == 32) {
+                pause = (pause) ? false : true;
             }
         })
 
