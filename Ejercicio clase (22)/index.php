@@ -19,7 +19,7 @@
         }
     </style>
 
-    <canvas id="canvas" width="500" height="500">
+    <canvas id="canvas" width="1000" height="600">
         Tu navegador no admite el elemento &lt;canvas&gt;.
     </canvas>
 
@@ -31,7 +31,7 @@
         let context = null;
         let player1 = null;
         let player2 = null;
-        
+
         /*
             TODO: Hacer un ciclo para generar crear objetos cuadrados y que se pinten por el mapa
             * For
@@ -39,10 +39,11 @@
             ! Agregar pantalla de muerte y si el usuario ingresa la tecla F pueda volver a empezar
             * Variable para validar cuando toque morir, y cuando ingrese la tecla F pueda volver, se validara este estado siempre que empieze el juego en la funcion start()
         */
-        let arregloParedes = []; 
-        
+        let arregloParedes = [];
+
         let score = 0;
-        let speed = 10;
+        let speed = 5;
+        let dead = false;
         let pause = false;
 
 
@@ -58,15 +59,25 @@
 
 
 
+
+
         function start() {
+
+
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
             canvas.style.background = "#ff8";
 
-            player1 = new Cuadrado(x, y, 40, 40, 'red');
-            player2 = new Cuadrado(getRandomInt(460), getRandomInt(460), 40, 40, 'red');
+            player1 = new Jugador(x, y, 40, 40, 'red', 3);
+            player2 = new Cuadrado(getRandomInt(900), getRandomInt(540), 40, 40, 'red');
 
+            // * Generador de obstaculos
+            for (let i = 0; i <= 4; i++) {
+                let obstaculo = new Cuadrado(getRandomInt(900), getRandomInt(540), 40, 40, '#808080');
+                arregloParedes.push(obstaculo);
+            }
             paint();
+
         }
 
 
@@ -79,26 +90,37 @@
 
             // Rellenar el canvas y hacer como que borra el trayecto
             context.fillStyle = "#ff8";
-            context.fillRect(0, 0, 500, 500);
+            context.fillRect(0, 0, 1000, 600);
 
             context.fillStyle = "#000";
             context.font = "25px Arial";
-            context.fillText("Score: " + score + "                                   " + "Speed: " + speed, 20, 40);
+            context.fillText("Score: " + score + "                                   " + "Speed: " + speed + "                                                " + "Lifes: " + player1.lifes + " ", 20, 40);
 
             // Creando el rectangulo que se pinta conforme la tecla
             player1.color = getRandomColor();
             player1.dibujar(context);
             player2.dibujar(context);
 
+            // * Creando los obstaculos
+            arregloParedes.map((obstaculo) => {
+                obstaculo.dibujar(context);
+            })
 
-            if (!pause) {
+
+            if (!pause && !dead) {
                 update();
+            } else if (dead) {
+                context.fillStyle = "rgba(0,0,0,0.5)";
+                context.fillRect(0, 0, 1000, 600);
+                context.fillStyle = "#fff";
+                context.font = "35px Arial";
+                context.fillText("DEAD", 425, 300);
             } else {
                 context.fillStyle = "rgba(0,0,0,0.5)";
-                context.fillRect(0, 0, 500, 500);
+                context.fillRect(0, 0, 1000, 600);
                 context.fillStyle = "#fff";
-                context.font = "30px Arial";
-                context.fillText("Pause", 200, 250);
+                context.font = "35px Arial";
+                context.fillText("Pause", 425, 300);
             }
         }
 
@@ -106,39 +128,59 @@
 
             if (direction === 'down') {
                 player1.y += speed;
-                if (player1.y > 500) {
+                if (player1.y > 600) {
                     player1.y = 0
                 }
             }
             if (direction === 'up') {
                 player1.y -= speed;
                 if (player1.y < 0) {
-                    player1.y = 500;
+                    player1.y = 600;
                 }
             }
             if (direction === 'right') {
                 player1.x += speed;
-                if (player1.x > 500) {
+                if (player1.x > 1000) {
                     player1.x = 0;
                 }
             }
             if (direction === 'left') {
                 player1.x -= speed;
                 if (player1.x < 0) {
-                    player1.x = 500;
+                    player1.x = 1000;
                 }
             }
 
 
+            /*
+             *   Condicional para saber si nuestro player a tocado la recompensa para subir velocidad y dar mas score
+             */
             if (player1.se_tocan(player2)) {
-                player2.x = getRandomInt(400);
-                player2.y = getRandomInt(400);
+                player2.x = getRandomInt(900);
+                player2.y = getRandomInt(500);
                 score += 10;
                 speed += 5;
             }
+
+            /*
+             *   Buscar que nuestro player no toque ninguno de los obstaculos o se detendra el juego
+             */
+            arregloParedes.map((obstaculo) => {
+                if (player1.se_tocan(obstaculo)) {
+                    if (player1.lifes <= 1) {
+                        dead = true;
+                        speed = 0;
+                    } else {
+                        player1.lifes = player1.lifes - 1;
+                        player1.x = getRandomInt(900);
+                        player1.y = getRandomInt(500);
+                    }
+                }
+            })
         };
 
 
+        // * Clase Cuadrado que es nuestra clase molde para todo los objetos
         class Cuadrado {
             constructor(x, y, w, h, color) {
                 this.x = x;
@@ -155,9 +197,35 @@
             }
 
             se_tocan = function(target) {
+                if (this.x < target.x + target.w &&
 
+                    this.x + this.w > target.x &&
 
+                    this.y < target.y + target.h &&
 
+                    this.y + this.h > target.y) {
+                    return true;
+                }
+            };
+        }
+
+        class Jugador {
+            constructor(x, y, w, h, color, lifes) {
+                this.x = x;
+                this.y = y;
+                this.w = h;
+                this.h = h;
+                this.color = color;
+                this.lifes = lifes;
+            }
+
+            dibujar = function(context) {
+                context.fillStyle = this.color;
+                context.fillRect(this.x, this.y, this.w, this.h);
+                context.strokeRect(this.x, this.y, this.w, this.h);
+            }
+
+            se_tocan = function(target) {
                 if (this.x < target.x + target.w &&
 
                     this.x + this.w > target.x &&
@@ -172,7 +240,7 @@
 
 
 
-        // Funcion para cambiar de color 
+        // ! Funcion para cambiar de color !
         function getRandomColor() {
             var letters = '0123456789ABCDEF';
             var color = '#';
@@ -183,13 +251,12 @@
         }
 
 
-        // Generar numero random
+        //  ! Generar numero random !
         function getRandomInt(max) {
             return Math.floor(Math.random() * max);
         }
 
-        // Movimiento con tecla y flechas
-
+        // * Movimiento con tecla y flechas
         document.addEventListener('keydown', ({
             keyCode
         }) => {
