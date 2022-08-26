@@ -31,14 +31,6 @@
         let context = null;
         let player1 = null;
         let player2 = null;
-
-        /*
-            TODO: Hacer un ciclo para generar crear objetos cuadrados y que se pinten por el mapa
-            * For
-            * Validar que el objeto nuestro toque cualquier pared y igualar la velocidad a 0 para que este se pare
-            ! Agregar pantalla de muerte y si el usuario ingresa la tecla F pueda volver a empezar
-            * Variable para validar cuando toque morir, y cuando ingrese la tecla F pueda volver, se validara este estado siempre que empieze el juego en la funcion start()
-        */
         let arregloParedes = [];
 
         let score = 0;
@@ -47,17 +39,21 @@
         let pause = false;
 
 
+        // Imagenes 
+        let zombie = new Image();
+        let carne = new Image();
+        let wall = new Image();
+
+        // Audio
+        let sonido1 = new Audio();
 
         let color = 'red';
         let figura = 'circulo';
         let isPress = false;
+
         let x = 240;
         let y = 240;
         let direction = 'up';
-
-
-
-
 
 
 
@@ -73,11 +69,15 @@
 
             // * Generador de obstaculos
             for (let i = 0; i <= 4; i++) {
-                let obstaculo = new Cuadrado(getRandomInt(900), getRandomInt(540), 40, 40, '#808080');
+                let obstaculo = new Cuadrado(getRandomInt(900), getRandomInt(540), 40, 100, '#808080');
                 arregloParedes.push(obstaculo);
             }
-            paint();
+            zombie.src = "zombie.png";
+            carne.src = "carne.png";
+            wall.src = "wall.jpg";
 
+            sonido1.src = "sonido_zombie.mp3";
+            paint();
         }
 
 
@@ -98,13 +98,26 @@
 
             // Creando el rectangulo que se pinta conforme la tecla
             player1.color = getRandomColor();
-            player1.dibujar(context);
-            player2.dibujar(context);
+
+            // * Se dibujan el jugador y el bono
+            // player1.dibujar(context);
+            // player2.dibujar(context);
 
             // * Creando los obstaculos
             arregloParedes.map((obstaculo) => {
                 obstaculo.dibujar(context);
             })
+
+            //  * Se dibuja la imagen del zombie en el jugador *
+            context.drawImage(zombie, player1.x, player1.y);
+
+            //  * Se dibuja la imagen del carne al bono*
+            context.drawImage(carne, player2.x, player2.y);
+
+            //  * Se dibuja la imagen del carne al bono*
+            arregloParedes.map((obstaculo) => {
+                context.drawImage(wall, obstaculo.x, obstaculo.y, 40, 100);
+            });
 
 
             if (!pause && !dead) {
@@ -160,6 +173,8 @@
                 player2.y = getRandomInt(500);
                 score += 10;
                 speed += 5;
+                sonido1.play();
+
             }
 
             /*
@@ -185,7 +200,7 @@
             constructor(x, y, w, h, color) {
                 this.x = x;
                 this.y = y;
-                this.w = h;
+                this.w = w;
                 this.h = h;
                 this.color = color;
             }
@@ -209,6 +224,7 @@
             };
         }
 
+        // * Clase jugador para poder diferenciarlo de las clase de obstaculos
         class Jugador {
             constructor(x, y, w, h, color, lifes) {
                 this.x = x;
@@ -287,6 +303,7 @@
         })
 
         window.addEventListener("load", start);
+
 
         window.requestAnimationFrame = (function() {
             return window.requestAnimationFrame ||
