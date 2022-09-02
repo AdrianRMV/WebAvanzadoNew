@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Datos</title>
+    </head>
+    <body>
+        <div id="contenedor">
+            <h1></h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>email</th>
+                        <th>Phone</th>
+                        <th>website</th>
+                        <th>actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="u in users">
+                        <td>{{u.id}}</td>
+                        <td>{{u.name}}</td>
+                        <td>{{u.username}}</td>
+                        <td>{{u.email}}</td>
+                        <td>{{u.phone}}</td>
+                        <td>{{u.website}}</td>
+                        <td>
+                            <button>Edit</button>
+                            <button>Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <script src="https://unpkg.com/vue@3"></script>
+        <script type="text/javascript">
+            const { createApp } = Vue;
+
+            const app = createApp({
+                data() {
+                    return {
+                        users: null,
+                    };
+                },
+                methods: {},
+                mounted() {
+                    let user = localStorage.getItem('user');
+                    user = JSON.parse(user);
+                    console.log(user);
+
+                    fetch('data/users.json')
+                        .then((resp) => resp.json())
+                        // Se rellena el atributo users (arreglo) con toda la respuesta del fetch
+                        .then((resp) => (this.users = resp))
+                        .catch((err) => console.error(err));
+                },
+            }).mount('#contenedor');
+        </script>
+    </body>
+</html>

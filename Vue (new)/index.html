@@ -3,61 +3,35 @@
     <head>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Canvas</title>
+        <title>Vue Exercises</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
 
     <body>
         <div id="contenedor">
-            <fieldset>
-                <label for="" style="padding-right: 20px">Edad</label>
-                <input type="number" v-model="age" />
-
-                <!-- v-if elimina la variable -->
-                <!-- v-show le agrega solo un display: none -->
-                <!-- Pero funcionan exactamente igual en su sintaxis -->
-
-                <h1 v-if="age>=18">Pasele a pistear</h1>
-                <h1 v-show="age < 18">Fuga pa la casa</h1>
-            </fieldset>
-
-            <hr />
-            <h1>{{ name }}</h1>
-            <p>{{ lastname }}</p>
-
-            <fieldset>
-                <legend>Datos Personales</legend>
-                <input type="text" v-model="name" name="" />
-                <input type="text" v-model="lastname" lastname="" />
-                <button @click="saludar">Saludar</button>
-            </fieldset>
-
-            <hr />
-
-            <fieldset>
-                <legend>calculadora</legend>
-                <input type="number" v-model="num1" name="" />
-                <input type="number" v-model="num2" lastname="" />
-                <button @click="suma">suma</button>
-                <h3>{{ resultado }}</h3>
-            </fieldset>
-
-            <hr />
-
-            <h2>Plebada</h2>
-            <ul>
-                <li v-for="alumno in alumnos">{{alumno.name}}, Rol:  {{alumno.role}}</li>
-            </ul>
-
-            <hr>
-            <fieldset>
-                <legend>Nuevo alumno</legend>
-                <input type="text" v-model="a_name" name="" />
-                <input type="text" v-model="a_role" lastname="" />
-                <button @click="agregar">Agregar</button>
-            </fieldset>
-
-            <hr />
+            <form action="">
+                <fieldset>
+                    <legend>Datos de acceso</legend>
+                    <label for="">Correo</label>
+                    <input
+                        type="email"
+                        name="email"
+                        v-model="email"
+                        placeholder="Email"
+                        required
+                    />
+                    <label for="">Contraseña</label>
+                    <input
+                        type="password"
+                        v-model="password"
+                        name="email"
+                        placeholder="Password"
+                        required
+                    />
+                    <br />
+                    <button @click="login" type="submit">Acceder</button>
+                </fieldset>
+            </form>
         </div>
 
         <script src="https://unpkg.com/vue@3"></script>
@@ -67,46 +41,36 @@
             const app = createApp({
                 data() {
                     return {
-                        name: 'Adrian',
-                        lastname: 'Ramirez',
-                        num1: 0,
-                        num2: 0,
-                        resultado: 0,
-                        age: 0,
-                        alumnos: [
-                            {
-                                name: 'Adrian',
-                                role: 'Front End'
-                            },
-                            {
-                                name: 'Suzzet',
-                                role: 'Back End'
-                            },
-                            {
-                                name: 'Emanuele',
-                                role: 'movil'
-                            },
-                            {
-                                name: 'Isaac',
-                                role: 'Hacker'
-                            },
-                        ],
-                        a_name: '',
-                        a_role: ''
+                        users: null,
+                        email: '',
+                        password: '',
                     };
                 },
                 methods: {
-                    saludar() {
-                        alert('Hola, ' + this.name + ' ' + this.lastname);
+                    login(e) {
+                        e.preventDefault();
+                        this.users.map(({ name, username, email, password }) => {
+                            if ((this.email === email)) {
+                                if(this.password === password) {
+                                    let usr = {
+                                        name_t: name,
+                                        username_t: username,
+                                        email_t: email,
+                                    }
+                                    localStorage.setItem('user', JSON.stringify(usr));
+                                    window.location.href = 'anotherPage.html';
+                                }
+                            }
+                        });
                     },
-                    suma() {
-                        this.resultado = this.num1 + this.num2;
-                    },
-                    agregar(){
-                        this.alumnos.push({name:this.a_name,role:this.a_role});
-                        this.a_name = '';
-                        this.a_role = '';
-                    }
+                },
+                mounted() {
+
+                    fetch('data/users.json')
+                        .then((resp) => resp.json())
+                        // Se rellena el atributo users (arreglo) con toda la respuesta del fetch
+                        .then((resp) => (this.users = resp))
+                        .catch((err) => console.error(err));
                 },
             }).mount('#contenedor');
         </script>
