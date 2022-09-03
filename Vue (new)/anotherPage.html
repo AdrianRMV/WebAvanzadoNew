@@ -20,7 +20,7 @@
                     <input
                         type="text"
                         name="nombre"
-                        v-model="user_form.name"
+                        v-model="name_form"
                         placeholder="Name"
                         :required="obligatorio"
                     />
@@ -28,7 +28,7 @@
                     <label for="">Username</label>
                     <input
                         type="text"
-                        v-model="user_form.username"
+                        v-model="username_form"
                         name="username"
                         placeholder="Username"
                         :required="obligatorio"
@@ -38,7 +38,7 @@
                     <label for="">Email</label>
                     <input
                         type="email"
-                        v-model="user_form.email"
+                        v-model="email_form"
                         name="email"
                         placeholder="example@gmail.com"
                         :required="obligatorio"
@@ -48,7 +48,7 @@
                     <label for="">Phone</label>
                     <input
                         type="tel"
-                        v-model="user_form.phone"
+                        v-model="phone_form"
                         name="phone"
                         placeholder="6123482563"
                         :required="obligatorio"
@@ -58,7 +58,7 @@
                     <label for="">Website</label>
                     <input
                         type="url"
-                        v-model="user_form.website"
+                        v-model="website_form"
                         name="website"
                         placeholder="adrian.com"
                         :required="obligatorio"
@@ -108,20 +108,27 @@
                     return {
                         users: null,
                         show: false,
-                        user_form: {
-                            name: '',
-                            username: '',
-                            email: '',
-                            phone: '',
-                            website: '',
-                        },
+                        name_form: '',
+                        username_form: '',
+                        email_form: '',
+                        phone_form: '',
+                        website_form: '',
                         obligatorio: true,
                     };
                 },
                 methods: {
                     agregarUsuario(e) {
-                        e.preventDefault();
-                        this.users.push(this.user_form);
+                        // Obtiene el tamaño del arreglo para determinar el ultimo id y sumarle 1 para la creacion del nuevo
+                        id_temp = Object.keys(this.users).length + 1;
+                        // Se pushea como un objeto mas al arreglo de objetos que es "users"
+                        this.users.push({
+                            id: id_temp,
+                            name: this.name_form,
+                            username: this.username_form,
+                            email: this.email_form,
+                            phone: this.phone_form,
+                            website: this.website_form,
+                        });
                         this.show = false;
                     },
                 },
