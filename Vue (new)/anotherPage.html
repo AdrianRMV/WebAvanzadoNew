@@ -8,8 +8,70 @@
     </head>
     <body>
         <div id="contenedor">
-            <h1></h1>
-            <table>
+            <!-- <h1>Bienvenido {{usuarioIngresado_new}}</h1> -->
+            <button @click="show = !show" v-show="!show">
+                Agregar Nuevo Usuario
+            </button>
+
+            <form action="">
+                <fieldset v-show="show">
+                    <legend>Datos de acceso</legend>
+                    <label for="">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        v-model="user_form.name"
+                        placeholder="Name"
+                        :required="obligatorio"
+                    />
+                    <br />
+                    <label for="">Username</label>
+                    <input
+                        type="text"
+                        v-model="user_form.username"
+                        name="username"
+                        placeholder="Username"
+                        :required="obligatorio"
+                    />
+                    <br />
+
+                    <label for="">Email</label>
+                    <input
+                        type="email"
+                        v-model="user_form.email"
+                        name="email"
+                        placeholder="example@gmail.com"
+                        :required="obligatorio"
+                    />
+                    <br />
+
+                    <label for="">Phone</label>
+                    <input
+                        type="tel"
+                        v-model="user_form.phone"
+                        name="phone"
+                        placeholder="6123482563"
+                        :required="obligatorio"
+                    />
+                    <br />
+
+                    <label for="">Website</label>
+                    <input
+                        type="url"
+                        v-model="user_form.website"
+                        name="website"
+                        placeholder="adrian.com"
+                        :required="obligatorio"
+                    />
+                    <br />
+
+                    <button @click="agregarUsuario" type="submit">
+                        Agregar Usuario
+                    </button>
+                </fieldset>
+            </form>
+
+            <table v-show="!show">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -45,13 +107,27 @@
                 data() {
                     return {
                         users: null,
+                        show: false,
+                        user_form: {
+                            name: '',
+                            username: '',
+                            email: '',
+                            phone: '',
+                            website: '',
+                        },
+                        obligatorio: true,
                     };
                 },
-                methods: {},
+                methods: {
+                    agregarUsuario(e) {
+                        e.preventDefault();
+                        this.users.push(this.user_form);
+                        this.show = false;
+                    },
+                },
                 mounted() {
-                    let user = localStorage.getItem('user');
-                    user = JSON.parse(user);
-                    console.log(user);
+                    let usuarioIngresado = localStorage.getItem('user');
+                    usuarioIngresado = JSON.parse(usuarioIngresado);
 
                     fetch('data/users.json')
                         .then((resp) => resp.json())

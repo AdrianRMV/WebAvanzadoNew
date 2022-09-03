@@ -53,9 +53,9 @@
                             if ((this.email === email)) {
                                 if(this.password === password) {
                                     let usr = {
-                                        name_t: name,
-                                        username_t: username,
-                                        email_t: email,
+                                        nameTempo: name,
+                                        usernameTempo: username,
+                                        emailTempo: email,
                                     }
                                     localStorage.setItem('user', JSON.stringify(usr));
                                     window.location.href = 'anotherPage.html';
