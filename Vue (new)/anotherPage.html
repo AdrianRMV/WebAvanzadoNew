@@ -13,9 +13,9 @@
                 Agregar Nuevo Usuario
             </button>
 
-            <form action="">
+            <form>
                 <fieldset v-show="show">
-                    <legend>Datos de acceso</legend>
+                    <legend>Formulario Usuarios</legend>
                     <label for="">Nombre</label>
                     <input
                         type="text"
@@ -66,7 +66,7 @@
                     <br />
 
                     <button @click="agregarUsuario" type="submit">
-                        Agregar Usuario
+                        Aceptar
                     </button>
                 </fieldset>
             </form>
@@ -92,8 +92,8 @@
                         <td>{{u.phone}}</td>
                         <td>{{u.website}}</td>
                         <td>
-                            <button>Edit</button>
-                            <button>Delete</button>
+                            <button @click="editarUsuario(u)">Edit</button>
+                            <button @click="eliminarUsuario(u)">Delete</button>
                         </td>
                     </tr>
                 </tbody>
@@ -117,9 +117,10 @@
                     };
                 },
                 methods: {
-                    agregarUsuario(e) {
+                    agregarUsuario() {
                         // Obtiene el tamaño del arreglo para determinar el ultimo id y sumarle 1 para la creacion del nuevo
                         id_temp = Object.keys(this.users).length + 1;
+
                         // Se pushea como un objeto mas al arreglo de objetos que es "users"
                         this.users.push({
                             id: id_temp,
@@ -130,6 +131,34 @@
                             website: this.website_form,
                         });
                         this.show = false;
+                    },
+                    editarUsuario({
+                        id,
+                        name,
+                        username,
+                        email,
+                        phone,
+                        website,
+                    }) {
+                        // Rellenar formulario con Datos del usuario seleccionado
+                        this.name_form = name;
+                        this.username_form = username;
+                        this.email_form = email;
+                        this.phone_form = phone;
+                        this.website_form = website;
+
+                        // Formulario se abre
+                        this.show = true;
+                    },
+                    eliminarUsuario({ id }) {
+                        
+                        /* 
+                            Se filtra el arreglo de usuarios retornando 
+                            un arreglo nuevo donde esten todos los demas expecto el del id ingresado
+                        */ 
+                        remaing = this.users.filter(usr => usr.id != id);
+                        
+                        this.users = remaing;
                     },
                 },
                 mounted() {
