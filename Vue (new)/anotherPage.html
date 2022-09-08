@@ -5,18 +5,25 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Datos</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
     <body>
         <div id="contenedor">
             <!-- <h1>Bienvenido {{usuarioIngresado_new}}</h1> -->
-            <button @click="show = !show, add = !add" v-show="!show">
+            <button @click="show = !show, add = !add, edition = false" v-show="!show" class="btn btn-warning">
                 Agregar Nuevo Usuario
             </button>
 
             <form>
                 <fieldset v-show="show">
                     <legend>Formulario Usuarios</legend>
-                    <label>Nombre</label>
+                    <input
+                        type="text"
+                        name="id"
+                        v-model="id_form"
+                        v-show="id_hide"
+                    />
+                    <label>Nombre   </label>
                     <input
                         type="text"
                         name="nombre"
@@ -25,7 +32,7 @@
                         :required="obligatorio"
                     />
                     <br />
-                    <label>Username</label>
+                    <label>Username   </label>
                     <input
                         type="text"
                         v-model="username_form"
@@ -35,7 +42,7 @@
                     />
                     <br />
 
-                    <label>Email</label>
+                    <label>Email   </label>
                     <input
                         type="email"
                         v-model="email_form"
@@ -45,7 +52,7 @@
                     />
                     <br />
 
-                    <label>Phone</label>
+                    <label>Phone   </label>
                     <input
                         type="tel"
                         v-model="phone_form"
@@ -55,7 +62,7 @@
                     />
                     <br />
 
-                    <label>Website</label>
+                    <label>Website   </label>
                     <input
                         type="url"
                         v-model="website_form"
@@ -65,29 +72,30 @@
                     />
                     <br />
 
-                    <button @click="agregarUsuario" v-show="add" type="submit">
+                    <button @click="agregarUsuario" v-show="add" type="submit" class="btn btn-primary">
                         Aceptar
                     </button>
                     <button
                         @click="confirmarEdicion"
                         v-show="edition"
                         type="submit"
+                        class="btn btn-success"
                     >
                         Aceptar Edicion
                     </button>
                 </fieldset>
             </form>
 
-            <table v-show="!show">
+            <table v-show="!show" class="table table-dark table-striped">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Username</th>
-                        <th>email</th>
-                        <th>Phone</th>
-                        <th>website</th>
-                        <th>actions</th>
+                        <th>NAME</th>
+                        <th>USERNAME</th>
+                        <th>EMAIL</th>
+                        <th>PHONE</th>
+                        <th>WEBSITE</th>
+                        <th>ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,11 +108,13 @@
                         <td>{{u.website}}</td>
                         <td>
                             <button
-                                @click="editarUsuario(u), edition = !edition"
+                                @click="editarUsuario(u), add = false, edition = !edition"
+                                class="btn btn-outline-success"
+                                
                             >
                                 Edit
                             </button>
-                            <button @click="eliminarUsuario(u)">Delete</button>
+                            <button @click="eliminarUsuario(u)" class="btn btn-outline-danger">Delete</button>
                         </td>
                     </tr>
                 </tbody>
@@ -119,6 +129,7 @@
                     return {
                         users: null,
                         show: false,
+                        id_form: 0,
                         name_form: '',
                         username_form: '',
                         email_form: '',
@@ -126,13 +137,15 @@
                         website_form: '',
                         obligatorio: true,
                         add: false,
-                        edition: false,
+                        edition: true,
+                        id_hide: false,
                     };
                 },
                 methods: {
                     agregarUsuario() {
                         // Obtiene el tamaño del arreglo para determinar el ultimo id y sumarle 1 para la creacion del nuevo
                         id_temp = Object.keys(this.users).length + 1;
+                        this.id_form = id_temp;
 
                         // Se pushea como un objeto mas al arreglo de objetos que es "users"
                         this.users.push({
@@ -162,6 +175,8 @@
 
                         // Formulario se abre
                         this.show = true;
+                        this.id_form = id;
+                        console.log(this.edition);
                     },
                     eliminarUsuario({ id }) {
                         /*
@@ -169,12 +184,16 @@
                                         un arreglo nuevo donde esten todos los demas expecto el del id ingresado
                                     */
                         remaing = this.users.filter((usr) => usr.id != id);
-
                         this.users = remaing;
                     },
                     confirmarEdicion() {
-                        // TODO: terminar accion de edicion 
-                    },
+                        this.users[this.id_form-1].name = this.name_form;
+                        this.users[this.id_form-1].username = this.username_form;
+                        this.users[this.id_form-1].email = this.email_form;
+                        this.users[this.id_form-1].phone = this.phone_form;
+                        this.users[this.id_form-1].website = this.website_form;
+                        this.show = false;
+                    }
                 },
                 mounted() {
                     let usuarioIngresado = localStorage.getItem('user');
@@ -188,5 +207,7 @@
                 },
             }).mount('#contenedor');
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
     </body>
 </html>
