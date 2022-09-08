@@ -137,7 +137,7 @@
                         website_form: '',
                         obligatorio: true,
                         add: false,
-                        edition: true,
+                        edition: false,
                         id_hide: false,
                     };
                 },
@@ -193,6 +193,14 @@
                         this.users[this.id_form-1].phone = this.phone_form;
                         this.users[this.id_form-1].website = this.website_form;
                         this.show = false;
+                        
+                        this.name_form = "";
+                        this.username_form = "";
+                        this.email_form = "";
+                        this.phone_form = "";
+                        this.website_form = "";
+
+
                     }
                 },
                 mounted() {
